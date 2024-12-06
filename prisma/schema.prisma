@@ -1,0 +1,117 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+    id          String      @id @default(cuid())
+    createdAt   DateTime    @default(now()) @map("created_at")
+    updatedAt   DateTime    @default(now()) @map("updated_at")
+
+    email       String      @unique
+    password    String?
+
+    picture     String      @default("/uploads/no-user-image.png")
+
+    role        String      @default("user")
+
+    reviews     Review[]
+
+    orders      Order[]
+
+    @@map("user")
+}
+
+model Product {
+    id          String    @id @default(cuid())
+    createdAt   DateTime  @default(now()) @map("created_at")
+    updatedAt   DateTime  @default(now()) @map("updated_at")
+
+    title       String
+    description String
+    price       Int
+    images      String[]
+
+    Category    Category?   @relation(fields: [categoryId], references: [id])
+    categoryId  String?     @map("category_id")
+
+    orderItems  OrderItem[]
+
+    @@map("product")
+
+}
+
+model Category {
+    id          String    @id @default(cuid())
+    createdAt   DateTime  @default(now()) @map("created_at")
+    updatedAt   DateTime  @default(now()) @map("updated_at")
+
+    title       String
+    description String
+
+    products    Product[]
+
+    @@map("category")
+}
+
+model Review {
+    id          String      @id @default(cuid())
+    createdAt   DateTime    @default(now()) @map("created_at")
+    updatedAt   DateTime    @default(now()) @map("updated_at")
+
+    text        String
+    rating      Int
+    
+    user        User?       @relation(fields: [userId], references: [id])
+    userId      String?     @map("user_id")
+
+    @@map("review")
+}
+
+model Order {
+    id          String              @id @default(cuid())
+    createdAt   DateTime            @default(now()) @map("created_at")
+    updatedAt   DateTime            @default(now()) @map("updated_at")
+
+    status      EnumOrderStatus     @default(PENDING)
+
+    items       OrderItem[]
+    total       Int
+
+    user        User?               @relation(fields: [userId], references: [id])
+    userId      String?             @map("user_id")
+
+    @@map("order")
+}
+
+model OrderItem {
+    id        String        @id @default(cuid())
+    createdAt DateTime      @default(now()) @map("created_at")
+    updatedAt DateTime      @default(now()) @map("updated_at")
+
+    quentity    Int
+    price       Int
+
+    product     Product?    @relation(fields: [productId], references: [id])
+    productId   String?     @map("product_id")
+
+    order       Order?      @relation(fields: [orderId], references: [id])
+    orderId     String?     @map("order_id")
+
+    @@map("order_item")
+}
+
+enum EnumOrderStatus {
+    PENDING
+    PAYED
+}
