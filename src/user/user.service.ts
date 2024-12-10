@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma.service';
 import {hash} from 'argon2';
 import { AuthDto } from 'src/auth/dto/auth.dto';
 import { User } from '@prisma/client';
+import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
@@ -54,6 +55,12 @@ export class UserService {
         return user.role === 'admin' ? true : false
     }
 
+    async getOrders(id:string){
+        const user = await this.getById(id)
+        
+        return user.orders
+    }
+
     async create(dto: AuthDto) {
         return this.prisma.user.create({
             data: {
@@ -81,5 +88,26 @@ export class UserService {
             where: { id: userId },
             data: { role: newRole },
         });
+    }
+
+    async update(userId: string, dto:UserDto) {
+        const newPicture = dto.picture[0];
+
+
+        const { picture, ...rest } = dto;
+
+        const newdata = {
+            ...rest,
+            picture: newPicture
+        };
+
+        const user = await this.prisma.user.update({
+            where: {
+                id: userId
+            },
+            data: newdata
+        })
+
+        return user
     }
 }

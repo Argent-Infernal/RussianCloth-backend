@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { CurrentUser } from './decorators/user.decorator';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { RolesGuard } from './guards/roles.guard';
+import { UserDto } from './dto/user.dto';
 
 @Controller('user')
 export class UserController {
@@ -10,9 +11,14 @@ export class UserController {
 
     @Auth()
     @Get('profile')
-
     async getProfile(@CurrentUser('id') id:string){
         return this.userService.getById(id)
+    }
+
+    @Auth()
+    @Put('update')
+    async update(@CurrentUser('id') id:string, @Body() dto:UserDto){
+        return this.userService.update(id, dto)
     }
 
     @Auth()
@@ -26,6 +32,12 @@ export class UserController {
     @Get('get-all')
     async getAll(){
         return this.userService.getAll()
+    }
+
+    @Auth()
+    @Get('get-orders')
+    async getOrders(@CurrentUser('id') id:string){
+        return this.userService.getOrders(id)
     }
 
     @UseGuards(RolesGuard)

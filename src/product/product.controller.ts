@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Param, Delete, UsePipes, ValidationPipe, HttpCode, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UsePipes, ValidationPipe, HttpCode, Put, UseGuards } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { ProductDto } from './dto/product.dto';
+import { RolesGuard } from 'src/user/guards/roles.guard';
 
 @Controller('products')
 export class ProductController {
@@ -19,6 +20,7 @@ export class ProductController {
 
     @UsePipes(new ValidationPipe())
     @HttpCode(200)
+    @UseGuards(RolesGuard)
     @Auth()
     @Post()
     async create(@Body() dto:ProductDto) {
@@ -27,6 +29,7 @@ export class ProductController {
 
     @UsePipes(new ValidationPipe())
     @HttpCode(200)
+    @UseGuards(RolesGuard)
     @Auth()
     @Put(':id')
     async update(@Param('id') id:string, @Body() dto:ProductDto) {
@@ -34,6 +37,7 @@ export class ProductController {
     }
 
     @HttpCode(200)
+    @UseGuards(RolesGuard)
     @Auth()
     @Delete(':id')
     async delete(@Param('id') id:string) {

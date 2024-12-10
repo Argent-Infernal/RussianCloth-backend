@@ -25,6 +25,12 @@ model User {
 
     role        String      @default("user")
 
+    address     String?
+    fullname    String?
+    country     String?
+    postalCode  String?
+    phone       String?
+
     reviews     Review[]
 
     orders      Order[]
@@ -88,6 +94,13 @@ model Order {
     items       OrderItem[]
     total       Int
 
+    fullname    String
+    address     String
+    country     String
+    postalCode  String
+    phone       String
+    shopmethod  EnumShopMethods
+
     user        User?               @relation(fields: [userId], references: [id])
     userId      String?             @map("user_id")
 
@@ -99,7 +112,7 @@ model OrderItem {
     createdAt DateTime      @default(now()) @map("created_at")
     updatedAt DateTime      @default(now()) @map("updated_at")
 
-    quentity    Int
+    quantity    Int
     price       Int
 
     product     Product?    @relation(fields: [productId], references: [id])
@@ -111,7 +124,16 @@ model OrderItem {
     @@map("order_item")
 }
 
+enum EnumShopMethods {
+    CDEK
+    RUSSIAMAIL
+}
+
 enum EnumOrderStatus {
     PENDING
     PAYED
+    CANCELLED
+    ACCEPTED
+    SENT
+    DONE
 }
